@@ -20,6 +20,6 @@ public class Member {
     @Embedded // 내장 타입을 포함했다는 의미
     private Address addrees;
 
-    @OneToMany(mappedBy = "member") // 연관 관계 (order 테이블의 member 테이블과 매핑)
+    @OneToMany(mappedBy = "member") // 연관 관계 (order 테이블의 member 테이블과 매핑) > 양방향 매핑
     private List<Order> ordersList = new ArrayList<>();
 }
