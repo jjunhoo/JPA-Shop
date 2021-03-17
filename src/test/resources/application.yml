@@ -1,0 +1,19 @@
+spring:
+  datasource: # Spring Boot 가 jdbc:h2:mem:testdb url 을 생성하여 자동 생성하기 때문에 해당 파일의 h2 설정이 별도로 없어도 동작
+    url: jdbc:h2:mem:test # test > resources > application.yml 을 사용하며, jdbc:h2:mem:test를 사용하여 h2 를 memory 모드로 실행 가능
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create   # DDL 재생성
+    properties:
+      hibernate:
+        show_sql: true   # sql show (System.out 을 통해 출력)
+        format_sql: true # console formatting
+
+logging:
+  level:
+    org.hibernate.SQL: debug # Logger 를 통해 출력
+    org.hibernate.type: trace # JPA 쿼리 파라미터 출력
