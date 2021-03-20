@@ -21,5 +21,5 @@ public class Member {
     private Address addrees;
 
     @OneToMany(mappedBy = "member") // 연관 관계 (order 테이블의 member 테이블과 매핑) > 양방향 매핑
-    private List<Order> ordersList = new ArrayList<>();
+    private List<Order> orders = new ArrayList<>();
 }
