@@ -103,7 +103,7 @@ class OrderServiceTest {
     private Member getMember() {
         Member member = new Member();
         member.setName("KJH");
-        member.setAddrees(new Address("서울", "상암", "12345"));
+        member.setAddress(new Address("서울", "상암", "12345"));
         em.persist(member);
         return member;
     }

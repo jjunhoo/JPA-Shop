@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/header :: header"/>
-
 <body>
+
 <div class="container">
     <div th:replace="fragments/bodyHeader :: bodyHeader"/>
 
@@ -15,7 +15,7 @@
                 <div class="form-group mx-sm-1 mb-2">
                     <select th:field="*{orderStatus}" class="form-control">
                         <option value="">주문상태</option>
-                        <option th:each="status : ${(jpabook.jpashop.domain.OrderStatus).values()}"
+                        <option th:each="status : ${T(jpabook.jpashop.domain.OrderStatus).values()}"
                                 th:value="${status}"
                                 th:text="${status}">
                         </option>

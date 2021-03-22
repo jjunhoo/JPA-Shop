@@ -39,7 +39,7 @@ public class OrderController {
         // 하나의 상품만 주문 가능하도록 구현 (설계는 여러 상품 주문 가능)
         orderService.order(memberId, itemId, count);
 
-        return "redirect:orders";
+        return "redirect:/orders";
 
     }
 

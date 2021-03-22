@@ -33,6 +33,7 @@ public class Order {
 
     private LocalDateTime orderDate; // 주문시간 > java8
 
+    @Enumerated(EnumType.STRING)
     private OrderStatus status; // 주문상태 [ORDER, CANCEL] > ENUM
 
     // 해당 엔티티의 createOrder() 메소드를 사용하여 Order 를 생성하는 것을 강제하기 위하여 생성자 접근 제어자 protected 설정 (Service 레이어에서 Order 객체 생성 불가)
