@@ -7,7 +7,8 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create   # DDL 재생성
+      #ddl-auto: create   # DDL 재생성
+      ddl-auto: none      # DDL 재생성 (X)
     properties:
       hibernate:
         show_sql: true   # sql show (System.out 을 통해 출력)
