@@ -41,4 +41,12 @@ public class MemberService {
             throw new IllegalStateException("이미 존재하는 회원입니다.");
         }
     }
+
+    @Transactional
+    public void update(Long id, String name) {
+        // 준영속 상태
+        Member member = memberRepository.findOne(id); // 변경 감지 > 시작
+        member.setName(name);
+        // Transaction > commit 순간 flush 를 통해 name 이 update
+    }
 }
