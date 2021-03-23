@@ -1,13 +1,19 @@
 package jpabook.jpashop.api;
 
+import jpabook.jpashop.domain.Address;
 import jpabook.jpashop.domain.Order;
+import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto;
+import jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * xToOne - 최적화 (ManyToOne / OneToOne)
@@ -22,6 +28,7 @@ import java.util.List;
 public class OrderSimpleApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderSimpleQueryRepository orderSimpleQueryRepository;
 
     /**
      * 아래와 같이 사용할 경우, 무한 루프 이슈 발생
@@ -46,6 +53,74 @@ public class OrderSimpleApiController {
         }
 
         return all;
+    }
+
+    /**
+     * N + 1 이슈 발생
+     *
+     * Order 의 개수만큼 SimpleOrderDto 를 생성하면서 회원 / 배송을 각각 N번씩 지연 로딩 조회
+     *      => fetch join 을 통하여 해결 가능
+     *      => Order    - 1회 조회
+     *      => Member   - 2회 조회
+     *      => Delivery - 2회 조회
+     *      => 총 5회 조회
+     */
+
+    /* V2. Entity -> Response DTO 노출 방법 */
+    @GetMapping("/api/v2/simple-orders")
+    public List<SimpleOrderDto> ordersV2() {
+        // Order Data - 2개
+        List<Order> orders = orderRepository.findAll(new OrderSearch());
+
+        return orders.stream()
+                .map(SimpleOrderDto::new)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Order 조회 시 Order 클래스 안의 Member, Delivery 까지 fetch join 을 통하여 1번 조회
+     *      => Member, Delivery 클래스는 fetch = FetchType.LAZY
+     *      => 하지만, Order 를 통하여 Member, Delivery 를 조회할 때, 지연 로딩되지 않고 inner join 으로 함께 조회
+     *
+     *      => 조회 쿼리 1회로 셋팅하여 어느 정도의 최적화는 되었지만, 모든 필드에 대해 select 하는 이슈가 남아있음
+     */
+
+    /* V3. fetch join 을 통한 성농 최적화 (Response DTO 적용) */
+    @GetMapping("/api/v3/simple-orders")
+    public List<SimpleOrderDto> ordersV3() {
+        List<Order> orders = orderRepository.findAllWithMemberDelivery();
+
+        return orders.stream()
+                .map(SimpleOrderDto::new)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * V3 <-> V4
+     * Trade Off
+     *
+     */
+
+    /* V4. fetch join > 사용할 특정 필드만 조회 (DB Network 사용량 감소 효과) */
+    @GetMapping("/api/v4/simple-orders")
+    public List<OrderSimpleQueryDto> ordersV4() {
+        return orderSimpleQueryRepository.findOrderDtos();
+    }
+
+    static class SimpleOrderDto {
+        private Long orderId;
+        private String name;
+        private LocalDateTime orderDate;
+        private OrderStatus orderStatus;
+        private Address address;
+
+        public SimpleOrderDto(Order order) {
+            this.orderId = order.getId();
+            this.name = order.getMember().getName(); // Lazy 초기화 (Member - 1번씩 2번 (Order 개수만큼) SELECT)
+            this.orderDate = order.getOrderDate();
+            this.orderStatus = order.getStatus();
+            this.address = order.getDelivery().getAddress(); // Lazy 초기화 (Delivery - 1번씩 2번 (Order 개수만큼) SELECT)
+        }
     }
 
 }
