@@ -6,6 +6,7 @@ import jpabook.jpashop.domain.OrderItem;
 import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.repository.order.query.OrderFlatDto;
 import jpabook.jpashop.repository.order.query.OrderQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.Data;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,7 +60,7 @@ public class OrderApiController {
 
         return orders.stream()
                     .map(order -> new OrderDto(order))
-                    .collect(Collectors.toList());
+                    .collect(toList());
     }
 
     /**
@@ -69,7 +73,7 @@ public class OrderApiController {
 
         return orders.stream()
                 .map(order -> new OrderDto(order))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     /**
@@ -88,7 +92,7 @@ public class OrderApiController {
 
         return orders.stream()
                 .map(order -> new OrderDto(order))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     // V4
@@ -101,6 +105,14 @@ public class OrderApiController {
     @GetMapping("/api/v5/orders")
     public List<OrderQueryDto> ordersV5() {
         return orderQueryRepository.findAllByDto_optimization();
+    }
+
+    // V6
+    @GetMapping("/api/v6/orders")
+    public List<OrderFlatDto> ordersV6() {
+        List<OrderFlatDto> flats = orderQueryRepository.findAllByDto_flat();
+
+        return flats;
     }
 
     @Data
@@ -122,7 +134,7 @@ public class OrderApiController {
             // Entity 는 별도의 Response DTO 로 만들어주자
             this.orderItems = order.getOrderItems().stream()
                         .map(orderItem -> new OrderItemDto(orderItem))
-                        .collect(Collectors.toList());
+                        .collect(toList());
         }
     }
 
