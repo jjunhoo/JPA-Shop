@@ -106,4 +106,15 @@ public class OrderRepository {
                         "  join fetch oi.item i", Order.class)
                 .getResultList();
     }
+
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+        return em.createQuery(
+                // Order -> Member / Delivery 는 ManyToOne 관계이기 때문에 페이징 가능
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
 }

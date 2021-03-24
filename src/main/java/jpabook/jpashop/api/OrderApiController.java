@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +22,10 @@ public class OrderApiController {
 
     private final OrderRepository orderRepository;
 
-    // V1 : Entity 직접 조회 방법
+    /**
+     * Entity 직접 조회
+     */
+    // V1
     @GetMapping("/api/v1/orders")
     public List<Order> ordersV1() {
         List<Order> orders = orderRepository.findAll(new OrderSearch());
@@ -38,6 +42,9 @@ public class OrderApiController {
         return orders;
     }
 
+    /**
+     * Entity -> DTO 변환
+     */
     // V2
     @GetMapping("/api/v2/orders")
     public List<OrderDto> ordersV2() {
@@ -55,6 +62,25 @@ public class OrderApiController {
     @GetMapping("/api/v3/orders")
     public List<OrderDto> ordersV3() {
         List<Order> orders = orderRepository.findAllWithItem();
+
+        return orders.stream()
+                .map(order -> new OrderDto(order))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 1 : N : M 의 관계의 쿼리 최적화를 위해 application.yml > default_batch_fetch_size 셋팅
+     * OrderItem, Item 을 각각 쿼리하는게 아니라 IN Keyword 를 통하여 한번에 조회
+     *
+     * 페이징을 사용하면서 쿼리를 최적화 해야하는 경우 (선호 방법)
+     */
+    // V3.1
+    @GetMapping("/api/v3.1/orders")
+    public List<OrderDto> ordersV3_page(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "100") int limit)
+    {
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
 
         return orders.stream()
                 .map(order -> new OrderDto(order))

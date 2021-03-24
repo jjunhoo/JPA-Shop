@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public class Order {
     private Member member;
 
     // * orderItems 와 delivery 는 Order 에서만 참조 하고 있기 때문에 CascadeType.ALL 옵션 사용
+    // @BatchSize(size = 1000)
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL) // OrderItem 클래스의 order 필드와 매핑
     private List<OrderItem> orderItems = new ArrayList<>();
 

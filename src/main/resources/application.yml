@@ -13,6 +13,7 @@ spring:
       hibernate:
         show_sql: true   # sql show (System.out 을 통해 출력)
         format_sql: true # console formatting
+        default_batch_fetch_size: 100 # DB > 'IN' Query 개수 설정 (최대 1000개까지 IN 허용) - # N+1 이슈 > 1+1 로 최적화
 
 logging:
   level:
