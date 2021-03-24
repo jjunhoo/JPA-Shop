@@ -92,4 +92,18 @@ public class OrderRepository {
         ).getResultList();
     }
     */
+
+    public List<Order> findAllWithItem() {
+        return em.createQuery(
+                // Order 가 Inner Join 으로 2개가 아닌 4개가 나오게 되는데, distinct 를 통해 Order 데이터를 중복 제거 가능
+                // DB Query 에서는 Distinct 를 날리지만 중복 제거가 되지 않는데, JPA 에서 Entity 중복 제거
+
+                // * 1:N 컬렉션 fetch join 에서는 페이징 처리 X (Memory 에 올려두고 Sorting 을 하게 되는데, 최악의 경우 OOM 발생)
+                "select distinct o from Order o" +
+                        "  join fetch o.member m" +
+                        "  join fetch o.delivery d" +
+                        "  join fetch o.orderItem oi" +
+                        "  join fetch oi.item i", Order.class)
+                .getResultList();
+    }
 }

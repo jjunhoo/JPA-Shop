@@ -48,11 +48,17 @@ public class OrderApiController {
                     .collect(Collectors.toList());
     }
 
-    // TODO
+    /**
+     * Entity -> DTO 변환 - fetch join 최적화
+     */
+    // V3
     @GetMapping("/api/v3/orders")
     public List<OrderDto> ordersV3() {
-        // List<Order> orders = orderRepository.findAll(new OrderSearch());
-        return null;
+        List<Order> orders = orderRepository.findAllWithItem();
+
+        return orders.stream()
+                .map(order -> new OrderDto(order))
+                .collect(Collectors.toList());
     }
 
     @Data
