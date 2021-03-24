@@ -1,17 +1,15 @@
 package jpabook.jpashop.api;
 
-import jpabook.jpashop.domain.Address;
 import jpabook.jpashop.domain.Order;
 import jpabook.jpashop.domain.OrderItem;
-import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.repository.OrderRepository;
 import jpabook.jpashop.repository.OrderSearch;
 import jpabook.jpashop.repository.order.query.OrderFlatDto;
 import jpabook.jpashop.repository.order.query.OrderQueryDto;
 import jpabook.jpashop.repository.order.query.OrderQueryRepository;
-import lombok.Data;
+import jpabook.jpashop.service.query.OrderDto;
+import jpabook.jpashop.service.query.OrderQueryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +27,7 @@ public class OrderApiController {
 
     private final OrderRepository orderRepository;
     private final OrderQueryRepository orderQueryRepository;
+    private final OrderQueryService orderQueryService;
 
     /**
      * Entity 직접 조회
@@ -65,15 +64,14 @@ public class OrderApiController {
 
     /**
      * Entity -> DTO 변환 - fetch join 최적화
+     *
+     * OSIV 적용
      */
     // V3
     @GetMapping("/api/v3/orders")
     public List<OrderDto> ordersV3() {
-        List<Order> orders = orderRepository.findAllWithItem();
-
-        return orders.stream()
-                .map(order -> new OrderDto(order))
-                .collect(toList());
+        // open-session-in-view 옵션을 false 로 끄더라도 별도의 조회용 Service 를 @Transactional(readOnly = true) 로 만들어두었기 때문에 서비스 가능
+        return orderQueryService.ordersV3();
     }
 
     /**
@@ -115,7 +113,7 @@ public class OrderApiController {
         return flats;
     }
 
-    @Data
+    /*@Data
     static class OrderDto {
 
         private Long orderId;
@@ -136,11 +134,11 @@ public class OrderApiController {
                         .map(orderItem -> new OrderItemDto(orderItem))
                         .collect(toList());
         }
-    }
+    }*/
 
     // OrderItemDto > Wrapping
     // OrderItem - API 스펙 정의
-    @Data
+    /*@Data
     static class OrderItemDto {
 
         private String itemName;
@@ -152,5 +150,5 @@ public class OrderApiController {
             this.orderPrice = orderItem.getOrderPrice();
             this.count = orderItem.getCount();
         }
-    }
+    }*/
 }
