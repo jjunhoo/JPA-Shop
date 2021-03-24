@@ -85,7 +85,7 @@ public class OrderRepository {
     public List<OrderSimpleQueryDto> findOrderDtos() {
         return em.createQuery(
                 // OrderSimpleQueryDto Construct 에 조회 및 Response DTO 로 사용할 데이터 매핑
-                "select new jpabook.jpashop.repository.order.simplequery.OrderSimpleQueryDto(o.id, m.name, o.orderDate, o.status, d.address)" +
+                "select new OrderSimpleQueryDto(o.id, m.name, o.orderDate, o.status, d.address)" +
                         " from Order o" +
                         " join o.member m" +
                         " join o.delivery d", OrderSimpleQueryDto.class
@@ -102,7 +102,7 @@ public class OrderRepository {
                 "select distinct o from Order o" +
                         "  join fetch o.member m" +
                         "  join fetch o.delivery d" +
-                        "  join fetch o.orderItem oi" +
+                        "  join fetch o.orderItems oi" +
                         "  join fetch oi.item i", Order.class)
                 .getResultList();
     }
