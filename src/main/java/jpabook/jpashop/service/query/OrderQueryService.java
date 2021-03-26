@@ -22,7 +22,7 @@ public class OrderQueryService {
         List<Order> orders = orderRepository.findAllWithItem();
 
         return orders.stream()
-                .map(order -> new OrderDto(order))
+                .map(OrderDto::new)
                 .collect(toList());
     }
 }
